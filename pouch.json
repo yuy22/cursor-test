@@ -1,0 +1,17 @@
+{
+  "currentState": "initial",
+  "stateHistory": [
+    {
+      "from": "initial",
+      "command": "project",
+      "timestamp": "2026-03-11T14:56:33.250Z",
+      "args": [
+        {
+          "workingDirectory": "c:\\Users\\b886855456ly\\Desktop\\代码",
+          "ideType": "cursor"
+        }
+      ]
+    }
+  ],
+  "lastUpdated": "2026-03-11T14:56:33.414Z"
+}
