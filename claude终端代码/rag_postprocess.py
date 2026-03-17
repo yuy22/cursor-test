@@ -8,14 +8,21 @@ RAG 后处理：将 _v3.md 优化为 RAG 检索友好格式
 输入:  北师大版4年级数学下册教师用书_v3.md
 输出:  北师大版4年级数学下册教师用书_rag.md
 """
+import os
 import re
 import sys
+from pathlib import Path
 
 sys.stdout.reconfigure(encoding='utf-8')
 
-# ── 路径 ────────────────────────────────────────────────────────
-SRC  = r'C:\Users\b886855456ly\Desktop\四年级下册\word\教师用书_md_v2\北师大版4年级数学下册教师用书_v3.md'
-DEST = r'C:\Users\b886855456ly\Desktop\四年级下册\word\教师用书_md_v2\北师大版4年级数学下册教师用书_rag.md'
+# ── 路径（跨平台）────────────────────────────────────────────────────
+_base = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
+SRC = _base / "input" / "北师大版4年级数学下册教师用书_v3.md"
+if not SRC.exists():
+    SRC = _base / "北师大版4年级数学下册教师用书_v3.md"
+DEST = _base / "output" / "北师大版4年级数学下册教师用书_rag.md"
+if not DEST.parent.exists():
+    DEST.parent.mkdir(parents=True, exist_ok=True)
 
 # ── 中文数字转换 ─────────────────────────────────────────────────
 _DIGITS = '零一二三四五六七八九'

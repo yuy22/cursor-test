@@ -2,10 +2,11 @@
 修复 MD 文件中的坏 alt text（v2 - 支持多行 alt text）
 """
 import json
+import os
 import re
 from pathlib import Path
 
-BASE_DIR = Path(r"C:\Users\b886855456ly\Desktop\Claude结果")
+BASE_DIR = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
 STATE_FILE = BASE_DIR / "images" / "descriptions.json"
 
 BOOKS = [

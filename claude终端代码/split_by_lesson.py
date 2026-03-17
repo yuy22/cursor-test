@@ -14,6 +14,7 @@ split_by_lesson.py v2 — 按 PPT 课时精确切分教师用书
   └── ...
 """
 
+import os
 import re
 import sys
 from pathlib import Path
@@ -24,8 +25,11 @@ sys.stdout.reconfigure(encoding='utf-8')
 #  配置
 # ============================================================
 
-INPUT_FILE = Path(r"C:\Users\b886855456ly\Desktop\北师大版4年级数学下册教师用书(1)_RAG优化_base64.md")
-OUTPUT_DIR = Path(r"C:\Users\b886855456ly\Desktop\Claude结果\lessons")
+_base = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
+INPUT_FILE = _base / "北师大版4年级数学下册教师用书(1)_RAG优化_base64.md"
+if not INPUT_FILE.exists():
+    INPUT_FILE = _base / "input" / "北师大版4年级数学下册教师用书(1)_RAG优化_base64.md"
+OUTPUT_DIR = _base / "output" / "lessons"
 
 DRY_RUN = "--dry-run" in sys.argv
 TEST_LESSON = None

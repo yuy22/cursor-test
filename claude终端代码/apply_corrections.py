@@ -3,14 +3,16 @@
 Apply corrections from corrections.json to descriptions.json and MD files.
 """
 import json
+import os
 import re
 from pathlib import Path
 
-STATE = Path("C:/Users/b886855456ly/Desktop/Claude结果/images/descriptions.json")
-MD_BOOK1 = Path("C:/Users/b886855456ly/Desktop/Claude结果/北师大版4年级数学下册教师用书(1)_RAG优化.md")
-MD_BOOK2 = Path("C:/Users/b886855456ly/Desktop/Claude结果/四年级+整合与拓展_RAG优化.md")
-IMG_DIR = r"C:\Users\b886855456ly\Desktop\Claude结果\images"
-CORRECTIONS = Path("C:/Users/b886855456ly/Desktop/claude终端代码/corrections.json")
+_base = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
+STATE = _base / "images" / "descriptions.json"
+MD_BOOK1 = _base / "北师大版4年级数学下册教师用书(1)_RAG优化.md"
+MD_BOOK2 = _base / "四年级+整合与拓展_RAG优化.md"
+IMG_DIR = _base / "images"
+CORRECTIONS = Path(__file__).resolve().parent / "corrections.json"
 
 d = json.load(open(STATE, encoding="utf-8"))
 corrections = json.load(open(CORRECTIONS, encoding="utf-8"))

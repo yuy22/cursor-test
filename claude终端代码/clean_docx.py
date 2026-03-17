@@ -3,13 +3,18 @@
 俞正强《种子课》DOCX -> Markdown 数据清洗转换脚本
 数学符号均为简单 Unicode，直接保留，无需 LaTeX 转换
 """
-import sys, re
+import os
+import sys
+import re
 sys.stdout.reconfigure(encoding='utf-8')
 from docx import Document
 from pathlib import Path
 
-INPUT  = r"C:\Users\b886855456ly\Desktop\俞正强种子课      一个数学特级教师的思与行.docx"
-OUTPUT = r"C:\Users\b886855456ly\Desktop\俞正强种子课_cleaned.md"
+_base = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
+INPUT = _base / "input" / "俞正强种子课      一个数学特级教师的思与行.docx"
+if not INPUT.exists():
+    INPUT = _base / "俞正强种子课      一个数学特级教师的思与行.docx"
+OUTPUT = _base / "output" / "俞正强种子课_cleaned.md"
 
 # ──────────────────────────────────────────────
 # 1. 噪声过滤规则（返回 True 表示该行应丢弃）
@@ -277,4 +282,8 @@ def convert(input_path: str, output_path: str):
 
 
 if __name__ == '__main__':
-    convert(INPUT, OUTPUT)
+    if not INPUT.exists():
+        print(f"输入文件不存在: {INPUT}")
+        sys.exit(1)
+    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    convert(str(INPUT), str(OUTPUT))

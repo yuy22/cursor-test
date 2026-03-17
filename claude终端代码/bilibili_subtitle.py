@@ -9,6 +9,7 @@
 import json
 import os
 import sys
+from pathlib import Path
 import requests
 
 # ============================================================
@@ -17,7 +18,8 @@ import requests
 BVID = "BV1t4PGemEhw"
 CID = 28579139459
 TITLE = "《买菜》张静老师"
-OUTPUT = r"C:\Users\b886855456ly\Desktop\张静老师的空间\《买菜》张静老师.md"
+# 输出路径：环境变量 BILI_OUTPUT 或 当前目录/output
+OUTPUT = os.environ.get("BILI_OUTPUT", str(Path.cwd() / "output" / "《买菜》张静老师.md"))
 
 API_URL = "https://api.bilibili.com/x/player/wbi/v2"
 HEADERS = {

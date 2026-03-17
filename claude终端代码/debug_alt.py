@@ -1,8 +1,10 @@
 """Debug: 检查为什么替换不生效"""
-import json, re
+import json
+import os
+import re
 from pathlib import Path
 
-BASE_DIR = Path(r"C:\Users\b886855456ly\Desktop\Claude结果")
+BASE_DIR = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
 d = json.load(open(BASE_DIR / "images" / "descriptions.json", "r", encoding="utf-8"))
 
 path_map = {}

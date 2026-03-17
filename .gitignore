@@ -1,0 +1,16 @@
+# 输出目录
+output/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# 环境
+.env
+.venv/
+venv/
+
+# B站认证（勿提交）
+.bili_sessdata

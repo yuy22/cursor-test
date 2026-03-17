@@ -11,15 +11,17 @@ import os
 import re
 import sys
 import time
+from pathlib import Path
 import requests
 
 # ============================================================
-# 配置
+# 配置（跨平台）
 # ============================================================
 MID = 1871763681
 SEASON_ID = 4815902
-OUTPUT_DIR = r"C:\Users\b886855456ly\Desktop\张静老师的空间"
-SESSDATA_FILE = os.path.join(os.path.dirname(__file__), ".bili_sessdata")
+_base = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
+OUTPUT_DIR = _base / "output" / "张静老师的空间"
+SESSDATA_FILE = Path(__file__).resolve().parent / ".bili_sessdata"
 
 API_BASE = "https://api.bilibili.com"
 HEADERS = {
@@ -199,7 +201,7 @@ def main():
         raw_title = video["title"]
         short_title = clean_title(raw_title)
         filename = safe_filename(f"{idx:02d} {short_title}.md")
-        filepath = os.path.join(OUTPUT_DIR, filename)
+        filepath = OUTPUT_DIR / filename
 
         # 已存在则跳过
         if os.path.exists(filepath) and os.path.getsize(filepath) > 100:

@@ -9,10 +9,11 @@ import json
 import re
 import os
 import time
+from pathlib import Path
 from urllib.parse import quote
 
 # 读取SESSDATA
-SESSDATA_FILE = "C:/Users/b886855456ly/Desktop/claude终端代码/.bili_sessdata"
+SESSDATA_FILE = str(Path(__file__).resolve().parent / ".bili_sessdata")
 with open(SESSDATA_FILE, "r") as f:
     SESSDATA = f.read().strip()
 
@@ -201,7 +202,7 @@ def build_md_with_paragraphs(body):
 
     return "\n\n".join(lines)
 
-def download_smart(keyword, output_base="C:/Users/b886855456ly/Desktop", max_success=3):
+def download_smart(keyword, output_base=None, max_success=3):
     """
     智能下载流程：
     1. 搜索前10
@@ -209,6 +210,8 @@ def download_smart(keyword, output_base="C:/Users/b886855456ly/Desktop", max_suc
     3. 跳过无字幕的
     4. 成功3个就停止
     """
+    if output_base is None:
+        output_base = str(Path.cwd() / "output")
 
     print(f"\n[搜索] {keyword}...")
     videos = search_top_10(keyword)

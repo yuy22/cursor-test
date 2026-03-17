@@ -9,11 +9,15 @@ OCR 公式乱码清洗
   5. 报告无法自动修复的可疑内容
 """
 
+import os
 import re
 import sys
 from pathlib import Path
 
-MD_PATH = Path(r"C:\Users\b886855456ly\Desktop\Claude结果\四年级+整合与拓展_RAG优化.md")
+_base = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
+MD_PATH = _base / "四年级+整合与拓展_RAG优化.md"
+if not MD_PATH.exists():
+    MD_PATH = _base / "input" / "四年级+整合与拓展_RAG优化.md"
 
 def main():
     dry_run = "--dry-run" in sys.argv

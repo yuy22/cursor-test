@@ -1,0 +1,13 @@
+# 小学数学教学辅助工具集 - Python 依赖
+# 安装: pip install -r requirements.txt
+
+requests>=2.28.0
+python-docx>=0.8.11
+Pillow>=9.0.0
+pytesseract>=0.3.10
+lxml>=4.9.0
+PyMuPDF>=1.23.0
+
+# 开发/检查工具（可选）
+ruff>=0.1.0
+pytest>=7.0.0

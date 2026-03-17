@@ -9,8 +9,9 @@ import json
 import re
 import os
 import time
+from pathlib import Path
 
-SESSDATA_FILE = "C:/Users/b886855456ly/Desktop/claude终端代码/.bili_sessdata"
+SESSDATA_FILE = str(Path(__file__).resolve().parent / ".bili_sessdata")
 with open(SESSDATA_FILE, "r") as f:
     SESSDATA = f.read().strip()
 
@@ -163,11 +164,13 @@ def build_md_with_paragraphs(body):
 
     return "\n\n".join(lines)
 
-def download_videos(videos, output_base="C:/Users/b886855456ly/Desktop", max_success=3):
+def download_videos(videos, output_base=None, max_success=3):
     """
     下载视频列表
     【改进】：检查时长≥1380秒（23分钟）、防止重复标题
     """
+    if output_base is None:
+        output_base = str(Path.cwd() / "output")
 
     output_dir = os.path.join(output_base, "逐字稿", "北师大歌手大赛公开课")
     os.makedirs(output_dir, exist_ok=True)

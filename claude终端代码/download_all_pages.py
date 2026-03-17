@@ -4,12 +4,13 @@
 ======================================================================
 """
 import requests, json, re, time, os, sys
+from pathlib import Path
 
 sys.stdout.reconfigure(encoding='utf-8')
 
 BVID = "BV11A411N7Dy"
-OUTPUT_DIR = r"E:\同上一堂课"
-COOKIE_DIR = r"C:\Users\b886855456ly\Desktop\claude终端代码"
+OUTPUT_DIR = str(Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd()))) / "output" / "同上一堂课")
+COOKIE_DIR = str(Path(__file__).resolve().parent)
 BASE = "https://api.bilibili.com"
 
 HEADERS = {

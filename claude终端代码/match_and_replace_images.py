@@ -7,6 +7,7 @@
 """
 
 import json
+import os
 import shutil
 import sys
 from pathlib import Path
@@ -17,7 +18,7 @@ from PIL import Image
 #  路 径 配 置
 # =========================================================================
 
-BASE_DIR = Path(r"C:\Users\b886855456ly\Desktop\Claude结果")
+BASE_DIR = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
 BOOK2_IMG_DIR = BASE_DIR / "images" / "book2"
 DOCX_IMG_DIR = BASE_DIR / "images" / "docx_extracted"
 STATE_FILE = BASE_DIR / "images" / "descriptions.json"

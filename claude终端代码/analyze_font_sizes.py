@@ -1,19 +1,24 @@
 # -*- coding: utf-8 -*-
 """分析三个 docx 文件的字号分布，确定标题层级映射"""
+import os
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
+from pathlib import Path
 from docx import Document
 from collections import Counter
 
-DOCS = [
-    r'C:\Users\b886855456ly\Desktop\四年级下册\word\四年级+整合与拓展.docx',
-    r'C:\Users\b886855456ly\Desktop\四年级下册\word\王永春《小学数学教材一本通》.docx',
-    r'C:\Users\b886855456ly\Desktop\四年级下册\word\俞正强：低头找幸福.docx',
-]
+_base = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
+_names = ["四年级+整合与拓展.docx", "王永春《小学数学教材一本通》.docx", "俞正强：低头找幸福.docx"]
+DOCS = []
+for n in _names:
+    for p in [_base / "input" / n, _base / n]:
+        if p.exists():
+            DOCS.append(p)
+            break
 
 for path in DOCS:
     print(f'\n{"="*60}')
-    print(f'文件：{path.split(chr(92))[-1]}')
+    print(f'文件：{path.name}')
     print('='*60)
 
     doc = Document(path)

@@ -8,6 +8,7 @@
 
 import json
 import math
+import os
 import re
 import shutil
 from pathlib import Path
@@ -16,11 +17,12 @@ from pathlib import Path
 #  路 径
 # =========================================================================
 
-BASE = Path(r"C:\Users\b886855456ly\Desktop\Claude结果")
+_base = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
+BASE = _base
 BOOK2_DIR = BASE / "images" / "book2"
 STATE_FILE = BASE / "images" / "descriptions.json"
 MD_PATH = BASE / "四年级+整合与拓展_RAG优化.md"
-PDF_PATH = Path(r"E:\四下资料\pdf\四年级+整合与拓展(OCR).pdf")
+PDF_PATH = Path(os.environ.get("MATH_PDF_PATH", str(_base / "input" / "四年级+整合与拓展(OCR).pdf")))
 
 # 输出
 EXPORT_DIR = BASE / "images" / "低分辨率_待人工审查"
