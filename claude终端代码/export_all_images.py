@@ -67,29 +67,21 @@ print(f'删除: {len(deleted)} 张')
 # ── 生成审查用 HTML 报告 ─────────────────────────────────────
 html_rows_del = ''
 for rid, fname, data, reason, w, h, area, ratio, avg in deleted:
-    b64_tag = ''
-    try:
-        import base64
-        ext = Path(fname).suffix.lower()
-        mime = 'image/png' if ext == '.png' else 'image/jpeg'
-        b64 = base64.b64encode(data).decode()
-        b64_tag = f'<img src="data:{mime};base64,{b64}" style="max-width:120px;max-height:120px;border:1px solid #ccc">'
-    except Exception:
-        b64_tag = '(无法显示)'
-    html_rows_del += f'<tr><td>{rid}</td><td>{b64_tag}</td><td>{w}×{h}</td><td style="color:red">{reason}</td></tr>\n'
+    if '小碎片' in reason:
+        folder = '02_deleted_small'
+    elif '分隔线' in reason:
+        folder = '03_deleted_lines'
+    elif '空白' in reason or '水印' in reason:
+        folder = '04_deleted_blank'
+    else:
+        folder = '05_deleted_other'
+    img_tag = f'<img src="{folder}/{fname}" style="max-width:120px;max-height:120px;border:1px solid #ccc" onerror="this.style.display=\'none\'">'
+    html_rows_del += f'<tr><td>{rid}</td><td>{img_tag}</td><td>{w}×{h}</td><td style="color:red">{reason}</td></tr>\n'
 
 html_rows_kept = ''
 for rid, fname, data, detail in kept:
-    b64_tag = ''
-    try:
-        import base64
-        ext = Path(fname).suffix.lower()
-        mime = 'image/png' if ext == '.png' else 'image/jpeg'
-        b64 = base64.b64encode(data).decode()
-        b64_tag = f'<img src="data:{mime};base64,{b64}" style="max-width:120px;max-height:120px;border:1px solid #ccc">'
-    except Exception:
-        b64_tag = '(无法显示)'
-    html_rows_kept += f'<tr><td>{rid}</td><td>{b64_tag}</td><td style="color:green">{detail}</td></tr>\n'
+    img_tag = f'<img src="01_kept/{fname}" style="max-width:120px;max-height:120px;border:1px solid #ccc">'
+    html_rows_kept += f'<tr><td>{rid}</td><td>{img_tag}</td><td style="color:green">{detail}</td></tr>\n'
 
 html = f"""<!DOCTYPE html>
 <html lang="zh">
@@ -120,28 +112,28 @@ th{{background:#f5f5f5}}
 </table>
 </body></html>"""
 
-# ── 打包 zip ────────────────────────────────────────────────
+# ── 打包 zip（相对路径，解压后直接双击HTML）────────────────
 print('\n打包 zip...')
 with zipfile.ZipFile(ZIP_OUT, 'w', zipfile.ZIP_DEFLATED) as zf:
-    # HTML 审查报告（内嵌图片，单文件打开）
+    # HTML 报告放在根目录（与图片文件夹同级）
     zf.writestr('审查报告.html', html.encode('utf-8'))
 
     # 保留的图片
     for rid, fname, data, detail in kept:
-        zf.writestr(f'01_保留({len(kept)}张)/{fname}', data)
+        zf.writestr(f'01_kept/{fname}', data)
 
-    # 删除：按原因分子文件夹
+    # 删除：按原因分子文件夹（与HTML里的相对路径一致）
     for rid, fname, data, reason, *_ in deleted:
         if '小碎片' in reason:
-            folder = f'02_删除_小碎片'
+            folder = '02_deleted_small'
         elif '分隔线' in reason:
-            folder = f'03_删除_分隔线'
+            folder = '03_deleted_lines'
         elif '空白' in reason or '水印' in reason:
-            folder = f'04_删除_空白水印'
+            folder = '04_deleted_blank'
         elif '纯黑' in reason:
-            folder = f'05_删除_纯黑装饰'
+            folder = '05_deleted_black'
         else:
-            folder = f'06_删除_其他'
+            folder = '06_deleted_other'
         zf.writestr(f'{folder}/{fname}', data)
 
 print(f'\n完成！')
