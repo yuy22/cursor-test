@@ -1,8 +1,12 @@
-import re, json
+import json
+import os
+import re
+from pathlib import Path
 
+_base = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
 for name, path in [
-    ("book1", "C:/Users/b886855456ly/Desktop/Claude结果/北师大版4年级数学下册教师用书(1)_RAG优化.md"),
-    ("book2", "C:/Users/b886855456ly/Desktop/Claude结果/四年级+整合与拓展_RAG优化.md"),
+    ("book1", str(_base / "北师大版4年级数学下册教师用书(1)_RAG优化.md")),
+    ("book2", str(_base / "四年级+整合与拓展_RAG优化.md")),
 ]:
     text = open(path, encoding="utf-8").read()
     textin = len(re.findall(r"textin\.com", text))
@@ -15,7 +19,7 @@ for name, path in [
     print()
 
 print("=== descriptions.json ===")
-d = json.load(open("C:/Users/b886855456ly/Desktop/Claude结果/images/descriptions.json", encoding="utf-8"))
+d = json.load(open(_base / "images" / "descriptions.json", encoding="utf-8"))
 for book in ["book1", "book2"]:
     done = sum(1 for v in d[book].values() if v.get("status") == "done")
     total = len(d[book])

@@ -7,11 +7,17 @@
   3. 合并被页眉截断的碎片段落
 """
 
-import re, sys
+import os
+import re
+import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
-INPUT  = r'C:\Users\b886855456ly\Desktop\四年级下册\word\教师用书_md_v2\北师大版4年级数学下册教师用书_rag.md'
-OUTPUT = r'C:\Users\b886855456ly\Desktop\四年级下册\word\教师用书_md_v2\北师大版4年级数学下册教师用书_rag_fixed.md'
+from pathlib import Path
+_base = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
+INPUT = _base / "input" / "北师大版4年级数学下册教师用书_rag.md"
+if not INPUT.exists():
+    INPUT = _base / "北师大版4年级数学下册教师用书_rag.md"
+OUTPUT = _base / "output" / "北师大版4年级数学下册教师用书_rag_fixed.md"
 
 # ── 页眉模式 ─────────────────────────────────────────────────────
 # 处理三种形式：合并一行 / 单独"数学教师教学用书" / 单独"四年级下册"

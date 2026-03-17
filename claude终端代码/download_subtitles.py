@@ -8,10 +8,11 @@ import json
 import re
 import os
 import time
+from pathlib import Path
 from urllib.parse import quote
 
 # 读取SESSDATA
-SESSDATA_FILE = "C:/Users/b886855456ly/Desktop/claude终端代码/.bili_sessdata"
+SESSDATA_FILE = str(Path(__file__).resolve().parent / ".bili_sessdata")
 with open(SESSDATA_FILE, "r") as f:
     SESSDATA = f.read().strip()
 
@@ -160,8 +161,10 @@ def sentences_to_md(body):
 
     return "\n\n".join(lines)
 
-def download_and_save(videos, output_base="C:/Users/b886855456ly/Desktop"):
+def download_and_save(videos, output_base=None):
     """下载所有视频的字幕并保存"""
+    if output_base is None:
+        output_base = str(Path.cwd() / "output")
 
     # 创建文件夹结构
     output_dir = os.path.join(output_base, "逐字稿", "第八课_歌手大赛")

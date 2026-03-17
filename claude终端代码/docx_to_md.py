@@ -6,6 +6,7 @@
 
 import os
 import re
+import sys
 import zipfile
 import shutil
 from pathlib import Path
@@ -15,16 +16,25 @@ from docx import Document
 from lxml import etree
 
 # ============================================================
-# 配置
+# 配置（跨平台：环境变量或当前目录）
 # ============================================================
-TESSERACT_CMD  = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-TESSDATA_DIR   = r'C:\Users\b886855456ly\tessdata'
-SRC_DOCX       = r'C:\Users\b886855456ly\Desktop\四年级下册\word\北师大版4年级数学下册教师用书.docx'
-OUT_DIR        = r'C:\Users\b886855456ly\Desktop\四年级下册\word\教师用书_md'
-IMAGES_SUBDIR  = 'images'
+_base = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
+SRC_DOCX = _base / "input" / "北师大版4年级数学下册教师用书.docx"
+if not SRC_DOCX.exists():
+    SRC_DOCX = _base / "北师大版4年级数学下册教师用书.docx"
+OUT_DIR = _base / "output" / "教师用书_md"
+IMAGES_SUBDIR = 'images'
 
-pytesseract.pytesseract.tesseract_cmd = TESSERACT_CMD
-os.environ['TESSDATA_PREFIX'] = TESSDATA_DIR
+# Tesseract：Windows 需指定路径，Linux 通常已在 PATH
+if sys.platform == 'win32':
+    pytesseract.pytesseract.tesseract_cmd = os.environ.get("TESSERACT_CMD", r'C:\Program Files\Tesseract-OCR\tesseract.exe')
+    _tessdata = os.environ.get("TESSDATA_PREFIX", r'C:\Users\b886855456ly\tessdata')
+    if Path(_tessdata).exists():
+        os.environ['TESSDATA_PREFIX'] = _tessdata
+else:
+    pytesseract.pytesseract.tesseract_cmd = os.environ.get("TESSERACT_CMD", "tesseract")
+    if os.environ.get("TESSDATA_PREFIX"):
+        pass  # 已设置
 
 W_NS   = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
 M_NS   = 'http://schemas.openxmlformats.org/officeDocument/2006/math'
@@ -342,4 +352,8 @@ def convert(src: str, out_dir: str):
 
 
 if __name__ == '__main__':
-    convert(SRC_DOCX, OUT_DIR)
+    if not Path(SRC_DOCX).exists():
+        print(f"输入文件不存在: {SRC_DOCX}")
+        print("请将 docx 放置于当前目录或 input/ 下，或设置 MATH_TOOLKIT_BASE")
+        sys.exit(1)
+    convert(str(SRC_DOCX), str(OUT_DIR))

@@ -1,0 +1,20 @@
+[project]
+name = "math-teaching-toolkit"
+version = "0.1.0"
+description = "小学数学教学辅助工具集"
+readme = "README.md"
+requires-python = ">=3.9"
+
+[tool.ruff]
+target-version = "py39"
+line-length = 120
+exclude = ["__pycache__", ".git", "*.pyc"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501", "E402", "E401", "E741", "F401", "F541"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"

@@ -3,10 +3,11 @@
 """
 
 import json
+import os
 import re
 from pathlib import Path
 
-BASE = Path(r"C:\Users\b886855456ly\Desktop\Claude结果")
+BASE = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
 STATE_FILE = BASE / "images" / "descriptions.json"
 MD_PATH = BASE / "四年级+整合与拓展_RAG优化.md"
 

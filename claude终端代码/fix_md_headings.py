@@ -13,6 +13,7 @@
 # ============================================================
 """
 
+import os
 import re
 import sys
 from pathlib import Path
@@ -762,18 +763,28 @@ def process_file(input_path: Path, fix_func, output_dir: Path, book_type: str):
 
 
 def main():
-    output_dir = Path(r'C:\Users\b886855456ly\Desktop\Claude结果')
+    # 跨平台：环境变量 MATH_TOOLKIT_BASE 或当前目录
+    base = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
+    output_dir = base / "output"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # 文件1：教师用书
-    book1 = Path(r'C:\Users\b886855456ly\Downloads\北师大版4年级数学下册教师用书(1).md')
+    # 文件1：教师用书（优先当前目录，其次 input/）
+    book1 = base / "北师大版4年级数学下册教师用书(1).md"
+    if not book1.exists():
+        book1 = base / "input" / "北师大版4年级数学下册教师用书(1).md"
     if book1.exists():
         process_file(book1, fix_book1, output_dir, 'book1')
     else:
-        print(f"文件不存在: {book1}")
+        print(f"文件不存在: {book1}（可放置于当前目录或 input/）")
 
     # 文件2：整合与拓展
-    book2 = Path(r'C:\Users\b886855456ly\Downloads\四年级+整合与拓展.md')
+    book2 = base / "四年级+整合与拓展_RAG优化.md"
+    if not book2.exists():
+        book2 = base / "四年级+整合与拓展.md"
+    if not book2.exists():
+        book2 = base / "input" / "四年级+整合与拓展_RAG优化.md"
+    if not book2.exists():
+        book2 = base / "input" / "四年级+整合与拓展.md"
     if book2.exists():
         process_file(book2, fix_book2, output_dir, 'book2')
     else:

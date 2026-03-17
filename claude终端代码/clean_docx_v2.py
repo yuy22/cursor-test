@@ -13,12 +13,15 @@ from pathlib import Path
 from lxml import etree
 
 # ╔══════════════════════════════════════╗
-# ║            配置                      ║
+# ║            配置（跨平台）              ║
 # ╚══════════════════════════════════════╝
-INPUT  = r"C:\Users\b886855456ly\Desktop\四年级下册\word\俞正强种子课      一个数学特级教师的思与行.docx"
-OUT_DIR = r"C:\Users\b886855456ly\Desktop\Claude结果\种子课_cleaned_v2"
-OUT_MD  = os.path.join(OUT_DIR, "俞正强种子课_cleaned.md")
-IMG_DIR = os.path.join(OUT_DIR, "images")
+_base = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
+INPUT = _base / "input" / "俞正强种子课      一个数学特级教师的思与行.docx"
+if not INPUT.exists():
+    INPUT = _base / "俞正强种子课      一个数学特级教师的思与行.docx"
+OUT_DIR = _base / "output" / "种子课_cleaned_v2"
+OUT_MD = OUT_DIR / "俞正强种子课_cleaned.md"
+IMG_DIR = OUT_DIR / "images"
 
 # 图片分类阈值
 TINY_AREA   = 2000    # <2000px² 直接删（1px线条、点）
@@ -375,4 +378,8 @@ def convert():
 
 
 if __name__ == '__main__':
+    if not INPUT.exists():
+        print(f"输入文件不存在: {INPUT}")
+        sys.exit(1)
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
     convert()

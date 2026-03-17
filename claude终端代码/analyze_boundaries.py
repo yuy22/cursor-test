@@ -3,10 +3,19 @@
 analyze_boundaries.py — 找出 #### 学习目标 / #### 教学记录 标记，确定课时边界
 """
 
-import re, sys
+import os
+import re
+import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
-MD_PATH = r"C:\Users\b886855456ly\Desktop\北师大版4年级数学下册教师用书(1)_RAG优化_base64.md"
+from pathlib import Path
+_base = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
+MD_PATH = _base / "北师大版4年级数学下册教师用书(1)_RAG优化_base64.md"
+if not MD_PATH.exists():
+    MD_PATH = _base / "input" / "北师大版4年级数学下册教师用书(1)_RAG优化_base64.md"
+if not MD_PATH.exists():
+    print(f"文件不存在: {MD_PATH}")
+    sys.exit(1)
 text = open(MD_PATH, encoding='utf-8').read()
 lines = text.split('\n')
 

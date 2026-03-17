@@ -28,9 +28,9 @@ import requests
 #  配 置 常 量
 # =========================================================================
 
-BASE_DIR = Path(r"C:\Users\b886855456ly\Desktop\Claude结果")
+BASE_DIR = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
 IMG_DIR = BASE_DIR / "images"
-CODE_DIR = Path(r"C:\Users\b886855456ly\Desktop\claude终端代码")
+CODE_DIR = Path(__file__).resolve().parent
 
 BOOKS = {
     "book1": {

@@ -3,7 +3,9 @@
 """
 import json
 
-path = "C:/Users/b886855456ly/Desktop/Claude结果/images/descriptions.json"
+from pathlib import Path
+_base = Path(os.environ.get("MATH_TOOLKIT_BASE", str(Path.cwd())))
+path = _base / "images" / "descriptions.json"
 d = json.load(open(path, encoding="utf-8"))
 
 # =============================================
@@ -38,6 +40,6 @@ for num in check_book2:
             out.append("")
             break
 
-with open("C:/Users/b886855456ly/Desktop/Claude结果/review_compare.txt", "w", encoding="utf-8") as f:
+with open(_base / "review_compare.txt", "w", encoding="utf-8") as f:
     f.write("\n".join(out))
 print(f"Wrote {len(out)} lines")
