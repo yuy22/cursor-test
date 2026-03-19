@@ -72,68 +72,147 @@ PROXY = os.environ.get("HTTPS_PROXY", os.environ.get("HTTP_PROXY", ""))
 #  Vision Prompt
 # =========================================================================
 
-VISION_PROMPT = r"""你是一位小学数学教育专家，正在为《小学数学教材一本通》（K-6综合）的图片编写 RAG 检索用的文字描述。
+VISION_PROMPT = r"""你是一位有二三十年教龄的小学数学名师，正在为《小学数学教材一本通》（王永春著，小学1-6年级综合自学读本）的每张图片撰写描述。
 
-## 核心描述流程（必须严格遵守）
+这些描述将替换 Markdown 文档中的 [待描述图片] 占位符，供后续备课、RAG检索使用。
+目标：让完全看不到图片的读者，仅凭文字描述就能准确理解图片在教什么、怎么教。
 
-1. 先独立观察图片，识别图片本身的内容（形状、文字、标注、数学符号）
-2. 再阅读下方的上下文，判断上下文是否与图片内容相关
-3. 如果相关（如上下文提到"计数器"而图片确实是计数器），将上下文信息融入描述
-4. 如果不相关，只描述图片本身，不强行关联
-5. 禁止脱离图片内容进行猜测
+---
 
-## 图片文字规则
+## 第一步：先读上下文，定位这张图的教学位置
 
-图片中出现的所有文字（标题、标注、数值、标签）必须融入描述，说明它们的位置和含义。
-- ✅ "一个60度的锐角，图片上方写着'我想画60度的角'"
-- ❌ "一个 度的角"（留空白）
+阅读下方提供的图片前后文本，判断：
+1. 这一段在讲哪个数学概念/方法/规律？
+2. 这张图承担什么教学功能？（从下方选一个）
+   - 【引入情境】：用生活场景引出数学问题
+   - 【核心说理】：用直观模型解释数学本质（如分数模型、面积模型）
+   - 【算法示范】：展示计算步骤（如竖式、列表）
+   - 【练习题图】：供学生练习的题目图
+   - 【结论呈现】：总结规律、公式、结论
+   - 【装饰插图】：无数学内容的装饰性图片
 
-如果图片中的文字或细节看不清，直接写"（此处文字模糊，请参看原图）"。
-- ✅ "从左到右标注了4个数值（文字模糊，请参看原图）"
-- ❌ 猜测看不清的内容
+---
 
-## 数学公式格式
+## 第二步：用数学教师的眼光读图
 
-所有数学表达式用 LaTeX：
-- 行内：$\frac{3}{10}$、$0.1$、$\square$、$90°$
-- 独立：$$2.22+0.49=\square$$
-- 分数：$\frac{1}{10}$  填空：$\square$  乘除：$\times$ $\div$
+观察图片时，必须完整识别以下内容（凡图中出现的，一律转录，不得省略）：
 
-## 图片上下文
+**数字和符号**
+- 所有数字（包括角标、分子分母、坐标值）原文转录
+- 所有数学符号（$+$、$-$、$\times$、$\div$、$=$、$\square$、箭头）
 
-该图片前后的教材文本（仅供参考，如与图片内容不符请以图片为准）：
+**文字标注**
+- 图中出现的所有汉字（题目语、提示语、标签、图注）原文引用
+- 不能用"文字说明了…"代替，要原文写出来
+
+**视觉设计的数学含义**
+- 涂色/阴影区域：说明代表什么（如"左半部分阴影表示 $\frac{1}{2}$"）
+- 箭头/虚线：说明方向和含义
+- 分割线：说明平均分成几份
+- 括号/大括号：说明对应关系
+
+**如果图中文字或数字看不清**：写"（此处文字模糊，请参看原图）"，禁止猜测。
+
+---
+
+## 第三步：写描述——让不看图的人也能理解
+
+描述结构（按顺序写，可根据图片类型调整）：
+
+```
+【教学功能】这张图的教学功能是：___（引入情境/核心说理/算法示范/练习题图/结论呈现）
+
+【图片内容】___（具体描述图中的每个要素，见下方各类型要求）
+
+【与上下文的关系】配合上文"___"（引用上下文关键语句），直观说明___
+```
+
+---
+
+## 各类型图片的具体描述要求
+
+**分数/小数模型（涂色格、圆形分割、面积模型）**
+- 说清图形类型（正方形/圆形/长方形）、总份数、涂色份数
+- 写出对应的分数/小数表达：如"正方形平均分成10份，3份涂色，表示 $\frac{{3}}{{10}}=0.3$"
+
+**数轴图**
+- 写明范围（起点、终点）、刻度间隔代表的单位
+- 写出所有标注的点及其值
+- 如有箭头或标记，说明含义
+
+**计算竖式**
+- 逐行写出每个数字：被加数、加数、进位符号、结果
+- 如"竖式：$35+48$，个位 $5+8=13$，写3进1；十位 $3+4+1=8$；结果 $83$"
+
+**几何图形**
+- 图形类型、标注的边长/角度（原文转录数值）
+- 有无辅助线/虚线，说明用途
+- 如有阴影，说明阴影区域的含义
+
+**计数器/算盘**
+- 有几档、各档代表的数位（个位/十位/百位…）
+- 每档有几颗珠子
+- 整体表示的数是多少
+
+**统计图（条形图/折线图/饼图）**
+- 图表类型、横轴标签、纵轴标签及单位
+- 关键数据（最高/最低/某项的值）原文转录
+
+**练习题图**
+- 完整转录题目文字和数学符号
+- 如有填空格（$\square$）、括号，标明位置
+
+**思维导图/结构图**
+- 中心主题 + 所有分支（层级关系、内容）
+
+**场景插图（购物、测量等）**
+- 场景内容 + 图中出现的数字/价格/数量标注（原文）
+- 配合上下文说明教学意图
+
+**装饰图**
+- 无数学内容（如花边、分隔线、卡通人物）→ category 选 decorative，description 写"装饰图，无数学内容"
+
+---
+
+## 数学公式格式（LaTeX）
+
+- 行内：$\frac{{3}}{{10}}$、$0.1$、$\square$、$90°$、$\times$、$\div$
+- 独立公式：$$2.22+0.49=\square$$
+- 不等式：$3>\frac{{1}}{{2}}$
+
+---
+
+## 图片前后的教材上下文
+
+（这是图片在教材中的位置，帮助你判断图片的教学功能和数学含义。若图片与上下文不符，以图片为准。）
+
 ---
 {context}
 ---
 
-## 输出要求
+---
 
-输出严格 JSON（不要 markdown 代码块包裹）：
-{{"description": "对图片内容的详细描述，数学内容用 LaTeX", "category": "math_diagram / exercise / table / illustration / decorative", "quality": "clear / low_res / unreadable"}}
+## 输出格式
 
-### description 要求
-- 计数器/算盘：说清有几档、每档珠子数、赋值规则
-- 数学图：说清数学对象。如"正方形被平均分成10份，其中3份涂色，表示 $\frac{{3}}{{10}}=0.3$"
-- 数轴图：写明范围和关键刻度
-- 竖式图：写出完整算式
-- 练习题图：转录题目文字和数学符号
-- 几何图：说明图形类型、标注的边长/角度
-- 统计图：说明图表类型、轴标签、关键数据
-- 思维导图：说明中心主题和各分支内容
-- 场景插图：简要描述场景和教学意图
-- 装饰图：标记为 decorative，description 写"装饰图"
+输出严格 JSON，不要 markdown 代码块包裹，直接以 {{ 开头：
 
-### category 定义
-- math_diagram：数轴、分数模型、几何图形、面积模型、计算竖式、计数器等
-- exercise：练习题、样题、填空题
-- table：数据表格
-- illustration：有教学意义的场景插图（购物、测量、故事情境）
-- decorative：无教学信息的装饰（花边、分隔线、无内容卡通）
+{{
+  "description": "按上方三步结构写的完整图片描述",
+  "category": "math_diagram 或 exercise 或 table 或 illustration 或 decorative",
+  "quality": "clear 或 low_res 或 unreadable"
+}}
 
-### quality 定义
+**category 定义**
+- math_diagram：数轴、分数/小数模型、几何图、面积模型、计算竖式、计数器、思维导图等
+- exercise：练习题、样题、填空题（含题目文字）
+- table：数据表格、统计表
+- illustration：有教学内容的场景插图（购物、测量、故事情境、实物图）
+- decorative：无教学信息的装饰（花边、分隔线、纯装饰卡通）
+
+**quality 定义**
 - clear：文字和图形清晰可辨
-- low_res：能看大意但细节模糊
-- unreadable：无法辨认"""
+- low_res：能看大意但细节模糊（部分数字/文字需靠上下文补充）
+- unreadable：无法辨认任何内容"""
 
 
 # =========================================================================
@@ -172,12 +251,28 @@ RE_IMG_ANY = re.compile(
 )
 
 
+RE_HEADING = re.compile(r"^#{1,4}\s+.+")
+
+
+def find_nearest_heading(lines: list[str], before_idx: int) -> str:
+    """往上找最近的 Markdown 标题（## ~ ####），最多回溯 200 行"""
+    for i in range(before_idx - 1, max(-1, before_idx - 200), -1):
+        if RE_HEADING.match(lines[i].strip()):
+            return lines[i].strip()
+    return ""
+
+
 def extract_images_from_md() -> list[dict]:
     """
     扫描 MD 文件，提取所有待描述图片的信息。
 
     返回：
-      [{"path": "images/rId5.jpeg", "line_no": 6, "context": "...前后各5行文字..."}, ...]
+      [{"path": "images/rId5.jpeg", "placeholder_line": 6, "img_line": 7, "context": "..."}]
+
+    上下文构成：
+      - 最近的章节标题（往上最多找 200 行）
+      - 图片前 8 行有效文本
+      - 图片后 8 行有效文本
     """
     lines = MD_FILE.read_text(encoding="utf-8").splitlines()
     results = []
@@ -200,19 +295,49 @@ def extract_images_from_md() -> list[dict]:
         if not img_path:
             continue
 
-        # 上下文：前后各 5 行（跳过占位符行本身）
-        start = max(0, i - 5)
-        end = min(len(lines), img_line_no + 5)
-        ctx_lines = [
-            ln for k, ln in enumerate(lines[start:end])
-            if not RE_PENDING.match(ln.strip()) and not RE_IMG_LINE.match(ln.strip())
-        ]
-        context = "\n".join(ctx_lines).strip()
+        # --- 构建富上下文 ---
+
+        # 1. 最近章节/小节标题
+        nearest_heading = find_nearest_heading(lines, i)
+
+        # 2. 图片前 8 行有效文本（跳过空行、占位符、图片行）
+        before_lines = []
+        for k in range(i - 1, max(-1, i - 40), -1):
+            ln = lines[k].strip()
+            if not ln:
+                continue
+            if RE_PENDING.match(ln) or RE_IMG_LINE.match(ln):
+                continue
+            before_lines.insert(0, ln)
+            if len(before_lines) >= 8:
+                break
+
+        # 3. 图片后 8 行有效文本
+        after_lines = []
+        for k in range(img_line_no, min(len(lines), img_line_no + 40)):
+            ln = lines[k].strip()
+            if not ln:
+                continue
+            if RE_PENDING.match(ln) or RE_IMG_LINE.match(ln):
+                continue
+            after_lines.append(ln)
+            if len(after_lines) >= 8:
+                break
+
+        # 拼合上下文，突出章节标题位置
+        ctx_parts = []
+        if nearest_heading:
+            ctx_parts.append(f"【当前章节】{nearest_heading}")
+        if before_lines:
+            ctx_parts.append("【图片前文】\n" + "\n".join(before_lines))
+        if after_lines:
+            ctx_parts.append("【图片后文】\n" + "\n".join(after_lines))
+        context = "\n\n".join(ctx_parts)
 
         results.append({
-            "path": img_path,           # 相对路径 images/rId5.jpeg
-            "placeholder_line": i + 1,  # [待描述图片] 行号（1-indexed）
-            "img_line": img_line_no,     # ![图片](...) 行号
+            "path": img_path,
+            "placeholder_line": i + 1,
+            "img_line": img_line_no,
             "context": context,
         })
 
