@@ -1,8 +1,8 @@
 # RAG 知识库构建 — 操作手册
 
-> **目标**：将教材 PDF 转换为 RAG 检索友好的 Markdown，图片以本地路径 + Vision 描述（alt text）形式保留
-> **当前状态**：图片描述质量优化中（book2 截断修复 + OCR 公式乱码修复）
-> **最后更新**：2026-03-16
+> **目标**：将教材 PDF/DOCX 转换为 RAG 检索友好的 Markdown，图片以本地路径 + Vision 描述形式保留
+> **当前状态**：图片描述质量优化中（book2 截断修复 + OCR 公式乱码修复）；王永春一本通流水线已搭建
+> **最后更新**：2026-03-19
 
 ---
 
@@ -478,7 +478,88 @@ python process_images.py --phase describe
 | v6 | 03-14 | 语义切分完成，操作手册成型 |
 | v7 | 03-15 ~ 03-16 | 图片描述质量优化：Opus 重跑 + OCR 修复 + 低分辨率人工审查 |
 | v8 | 03-16 | 砍掉 base64 内嵌（步骤8）和语义切分（步骤9），改用本地路径方案；新增 OCR 公式乱码问题清单（`\sdiv`/`\line`/`\\`转义） |
+| v9 | 03-19 | 新增王永春一本通（DOCX→MD）图片描述流水线，脚本 `describe_wangyongchun.py` |
 
 ---
 
-*操作手册 v8 — 2026-03-16*
+## 王永春一本通 — 图片描述流水线（v9 新增）
+
+> **来源**：DOCX 扫描版，通过 `clean_docx_v2.py` 清洗后生成 `王永春一本通_cleaned.md`
+> **图片格式**：本地文件 `images/rId*.jpeg/png`（随 `images.zip` 一起交付）
+> **当前状态**：`describe` 阶段待执行（需 Vision API 代理）
+
+### 与 book1/book2 流水线的区别
+
+| 对比项 | book1/book2 | 王永春一本通 |
+|--------|-------------|-------------|
+| 图片来源 | textin.com 外部 URL | DOCX 提取的本地 rId*.jpeg |
+| 是否需要下载 | 是（`--phase download`） | 否（`--phase extract` 解压 zip） |
+| 图片占位符 | textin URL 直接嵌入 | `[待描述图片]` 行 |
+| 描述写入位置 | alt text（`![描述](路径)`） | 独立描述行（`[图片描述：...]`） |
+| 状态文件 | `images/descriptions.json` | `images/descriptions_wangyongchun.json` |
+
+### 脚本
+
+```
+claude终端代码/describe_wangyongchun.py
+```
+
+### 完整运行流程
+
+```bash
+cd "C:\Users\b886855456ly\Desktop"
+
+# 环境变量（可选，不设则用脚本内默认值）
+set WYC_BASE_DIR=C:\Users\b886855456ly\Desktop
+set VISION_API_BASE=https://www.78code.cc/v1
+set VISION_API_KEY=sk-xxx
+set VISION_MODEL=claude-opus-4-6
+set HTTPS_PROXY=http://127.0.0.1:7890
+
+# 步骤 1：解压图片（只需一次）
+python claude终端代码/describe_wangyongchun.py --phase extract
+
+# 步骤 2：Vision 描述（可断点续跑，已完成的自动跳过）
+python claude终端代码/describe_wangyongchun.py --phase describe
+
+# 步骤 3：写回 MD（幂等，可重复执行）
+python claude终端代码/describe_wangyongchun.py --phase update
+
+# 步骤 4：生成审核报告
+python claude终端代码/describe_wangyongchun.py --phase report
+
+# 随时查看进度
+python claude终端代码/describe_wangyongchun.py --phase status
+```
+
+### 输入 → 输出
+
+| 输入 | 输出 |
+|------|------|
+| `王永春一本通_cleaned.md`（1895 张 `[待描述图片]`） | 同文件原地更新（占位符替换为图片描述） |
+| `images.zip`（2064 张图片） | `images/rId*.jpeg/png`（解压到本地） |
+| — | `images/descriptions_wangyongchun.json`（状态文件） |
+| — | `images/flagged_report_wangyongchun.md`（审核报告） |
+
+### 处理统计（待完成）
+
+| 指标 | 数量 |
+|------|:----:|
+| 总图片数 | 1895 |
+| 图片文件数（zip） | 2064 |
+| Vision 描述完成 | 0（待运行） |
+
+### 描述写入格式
+
+```markdown
+[图片描述：正方形被平均分成4份，其中1份涂色，表示 $\frac{1}{4}=0.25$]
+![图片](images/rId42.jpeg)
+```
+
+- `decorative` 分类：整个图片块（占位符行 + 图片行）删除
+- `unreadable` 图片：描述改为"图片无法辨认，请参看原图"
+- `low_res` 图片：描述行写入，图片行下方加 `<!-- 低分辨率，建议人工核查 -->`
+
+---
+
+*操作手册 v9 — 2026-03-19*
